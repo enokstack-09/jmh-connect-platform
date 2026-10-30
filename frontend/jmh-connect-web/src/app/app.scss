@@ -1,0 +1,43 @@
+:host {
+  display: block;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  min-height: 4.25rem;
+  padding: 0.75rem clamp(1rem, 5vw, 4rem);
+  background: #464b71;
+  color: #fff;
+}
+.brand { display: flex; align-items: center; gap: .55rem; font-size: 1.05rem; }
+.brand span { display: grid; width: 2.2rem; height: 2.2rem; place-items: center; border-radius: .65rem; color: #464b71; background: #7cd5c7; font-size: .72rem; font-weight: 900; letter-spacing: .08em; }
+
+.app-header a {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.app-header nav {
+  display: flex;
+  align-items: center;
+  gap: .35rem;
+}
+.app-header nav a { padding: .55rem .75rem; border-radius: .55rem; color: rgb(255 255 255 / 78%); }
+.app-header nav a:hover, .app-header nav a.active { color: #fff; background: rgb(255 255 255 / 12%); }
+
+.app-header a:focus-visible {
+  outline: 3px solid #7cd5c7;
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .app-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .app-header nav { width: 100%; overflow-x: auto; }
+}

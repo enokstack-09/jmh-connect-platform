@@ -1,0 +1,1 @@
+export interface ReportSummary { activeResidents:number; archivedResidents:number; devotionSessions:number; presentAttendance:number; assignedDuties:number; completedDuties:number; scheduledEvents:number; fromUtc:string; toUtc:string; }

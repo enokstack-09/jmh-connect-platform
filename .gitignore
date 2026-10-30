@@ -1,0 +1,57 @@
+
+# Build and dependency output
+**/bin/
+**/obj/
+node_modules/
+dist/
+.angular/
+coverage/
+artifacts/
+
+# Local configuration, credentials and keys
+.env
+.env.*
+!.env.example
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.local.json
+secrets.json
+**/secrets.json
+**/DataProtection-Keys/
+**/.data-protection-keys/
+*.pfx
+*.pem
+*.key
+
+# Private files and local database data
+**/App_Data/
+**/private-photos/
+**/profile-photos/
+*.mdf
+*.ldf
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs, editors and temporary files
+*.log
+logs/
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.tmp
+*.bak
+.DS_Store
+Thumbs.db
+
+# Non-JMH / personal material retained locally only
+Personal_Productivity_App/
+PERSONAL_PRODUCTIVITY_APP_FINAL/
+documentation/
+Admin & Member.docx
+DAYNIX*
+*.apk
+*.aab
+*.zip

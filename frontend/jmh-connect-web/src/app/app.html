@@ -1,0 +1,17 @@
+<header class="app-header">
+  <a class="brand" routerLink="/home"><span>JMH</span> Connect</a>
+  <nav aria-label="Main navigation">
+    @if (auth.currentUser(); as user) {
+      <a routerLink="/home" routerLinkActive="active">Dashboard</a>
+      @if (user.role === 'Member' && user.memberProfileId) { <a routerLink="/my-profile" routerLinkActive="active">My Profile</a> }
+      <a routerLink="/members" routerLinkActive="active">Family Directory</a>
+      <a routerLink="/devotions" routerLinkActive="active">Devotions</a>
+      @if (user.role === 'Pastor' || user.role === 'Member') { <a routerLink="/duties" routerLinkActive="active">Duties</a> }
+      <a routerLink="/events" routerLinkActive="active">Events</a>
+      <a routerLink="/birthdays" routerLinkActive="active">Birthdays</a>
+      <a routerLink="/announcements" routerLinkActive="active">Announcements</a>
+      @if (user.role === 'Pastor') { <a routerLink="/reports" routerLinkActive="active">Reports</a> }
+    } @else { <a routerLink="/login" routerLinkActive="active">Sign in</a> }
+  </nav>
+</header>
+<router-outlet />

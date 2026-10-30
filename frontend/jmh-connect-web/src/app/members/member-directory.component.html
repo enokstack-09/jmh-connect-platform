@@ -1,0 +1,189 @@
+<main class="directory-shell">
+  <header class="directory-header">
+    <div>
+      <p class="eyebrow">JMH Connect</p>
+      <h1>Our JMH Family</h1>
+      <p class="intro">A welcoming, private directory for our boarding community.</p>
+    </div>
+    @if (isPastor()) {
+      <div class="pastor-actions">
+        <button class="quiet" type="button" (click)="showArchived()">Archive history</button>
+        <button type="button" (click)="beginCreate()">Add resident</button>
+      </div>
+    }
+  </header>
+
+  <section class="directory-tools" aria-label="Directory filters">
+    <div class="filter-tabs" role="group" aria-label="Resident type">
+      @for (kind of filters; track kind) {
+        <button type="button" [class.selected]="filter() === kind" (click)="setFilter(kind)">{{ kind }}</button>
+      }
+    </div>
+    <form class="search-form" (ngSubmit)="searchDirectory()">
+      <label class="sr-only" for="member-search">Search residents</label>
+      <input id="member-search" name="search" [(ngModel)]="search" placeholder="Search by name" />
+      <button class="quiet" type="submit">Search</button>
+    </form>
+  </section>
+
+  @if (error()) { <p class="message error" role="alert">{{ error() }}</p> }
+  @if (notice()) { <p class="message success" role="status">{{ notice() }}</p> }
+  @if (loading()) { <p class="state" role="status">Loading our family directory…</p> }
+  @else if (entries().length === 0) {
+    <section class="state"><h2>No residents found</h2><p>Try a different search or filter.</p></section>
+  } @else {
+    <section class="member-grid" aria-label="Active residents">
+      @for (member of entries(); track member.id) {
+        <button class="member-card" type="button" (click)="showMember(member.id)">
+          @if (member.hasApprovedPhoto) {
+            <img class="avatar image" [src]="photoUrl(member)" [alt]="displayName(member) + ' profile photo'" />
+          } @else { <span class="avatar" aria-hidden="true">{{ displayName(member).slice(0, 1) }}</span> }
+          <span class="member-copy"><strong>{{ displayName(member) }}</strong><span>{{ typeLabel(member.residentType) }} · {{ member.homeTown || 'Home town not recorded' }}</span></span>
+          <span class="view-cue">View profile</span>
+        </button>
+      }
+    </section>
+  }
+
+  @if (selected(); as member) {
+    <section class="overlay" role="dialog" aria-modal="true" aria-labelledby="member-title">
+      <article class="panel profile-panel">
+        <button class="close" type="button" (click)="closePanels()" aria-label="Close profile">×</button>
+        <header class="profile-hero">
+          @if (member.hasApprovedPhoto) {
+            <img class="avatar image large" [src]="photoUrl(member)" [alt]="displayName(member) + ' profile photo'" />
+          } @else { <span class="avatar large" aria-hidden="true">{{ displayName(member).slice(0, 1) }}</span> }
+          <div><p class="eyebrow">{{ typeLabel(member.residentType) }} resident</p><h2 id="member-title">{{ displayName(member) }}</h2><p>{{ member.homeTown }}</p></div>
+        </header>
+
+        <div class="detail-grid">
+          @if (member.dateOfBirth) { <p><span>Date of birth</span><strong>{{ member.dateOfBirth | date:'longDate' }}</strong></p> }
+          @if (member.studentDetails) {
+            <p><span>School</span><strong>{{ member.studentDetails.schoolName || 'Not recorded' }}</strong></p>
+            <p><span>Education level</span><strong>{{ member.studentDetails.educationLevel || 'Not recorded' }}</strong></p>
+            <p><span>Student ID</span><strong>{{ member.studentDetails.studentIdentifier || 'Not recorded' }}</strong></p>
+          }
+          @if (member.workerDetails) {
+            <p><span>Employer</span><strong>{{ member.workerDetails.employerName || 'Not recorded' }}</strong></p>
+            <p><span>Job title</span><strong>{{ member.workerDetails.jobTitle || 'Not recorded' }}</strong></p>
+            <p><span>Work location</span><strong>{{ member.workerDetails.workLocation || 'Not recorded' }}</strong></p>
+            <p><span>Work phone</span><strong>{{ member.workerDetails.workPhone || 'Not recorded' }}</strong></p>
+          }
+        </div>
+
+        @if (member.contacts?.length) {
+          <section class="profile-section"><h3>Family & emergency contacts</h3>
+            <div class="contact-list">@for (contact of member.contacts; track contact.id) {
+              <article><strong>{{ contact.fullName }}</strong><span>{{ contact.relationship }}</span>
+                @if (contact.phoneNumber) { <a [href]="'tel:' + contact.phoneNumber">{{ contact.phoneNumber }}</a> }
+                @if (contact.email) { <a [href]="'mailto:' + contact.email">{{ contact.email }}</a> }
+                <small>@if (contact.isGuardian) { Guardian } @if (contact.isEmergencyContact) { · Emergency contact }</small>
+              </article>
+            }</div>
+          </section>
+        }
+
+        @if (member.canManagePhoto || isPastor()) {
+          <section class="profile-section photo-tools"><h3>Profile photo</h3>
+            @if (photoManagement(); as photo) {
+              @if (photo.requiresGuardianConsent) {
+                <p class="privacy-note">This resident is under 18. Active guardian consent is required for upload and approval.</p>
+                @if (photo.activeConsent) {
+                  <div class="consent-status"><strong>Guardian consent active</strong><span>Recorded {{ photo.activeConsent.grantedUtc | date:'mediumDate' }}</span>
+                    @if (isPastor()) { <button class="text-button danger-text" type="button" [disabled]="submitting()" (click)="withdrawConsent()">Withdraw consent</button> }
+                  </div>
+                } @else if (isPastor()) {
+                  <div class="consent-form">
+                    <label>Guardian contact<select [(ngModel)]="guardianContactId"><option [ngValue]="null">Select guardian</option>@for (contact of guardianContacts(); track contact.id) { <option [ngValue]="contact.id">{{ contact.fullName }}</option> }</select></label>
+                    <label>Evidence reference<input [(ngModel)]="consentEvidence" placeholder="Document or conversation reference" /></label>
+                    <label class="full">Notes<textarea [(ngModel)]="consentNotes" rows="2"></textarea></label>
+                    <button type="button" [disabled]="!guardianContactId || submitting()" (click)="grantConsent()">Record consent</button>
+                  </div>
+                } @else { <p class="privacy-note">Ask a Pastor to record guardian consent before uploading a photo.</p> }
+              }
+              @if (photo.pendingPhoto) {
+                <div class="pending-review"><div><strong>Photo awaiting approval</strong><span>Submitted {{ photo.pendingPhoto.createdUtc | date:'medium' }}</span></div>
+                  @if (isPastor()) { <div><button type="button" [disabled]="submitting()" (click)="approvePhoto()">Approve</button><button class="danger" type="button" [disabled]="submitting()" (click)="rejectPhoto()">Reject</button></div> }
+                </div>
+              }
+              @if (member.residencyStatus !== 2) {
+                <div class="upload-row"><label class="file-picker">Choose JPEG, PNG or WebP<input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectPhoto($event)" /></label>
+                  <button type="button" [disabled]="!photoFile || submitting() || (photo.requiresGuardianConsent && !photo.activeConsent)" (click)="uploadPhoto()">Submit photo</button>
+                </div><small>Maximum 5 MB. A new photo stays private until Pastor approval.</small>
+              }
+            } @else { <p class="privacy-note">Loading secure photo controls…</p> }
+          </section>
+        }
+
+        @if (isPastor()) {
+          <section class="profile-section"><h3>Audit history</h3>
+            @if (history().length === 0) { <p class="privacy-note">No recorded changes yet.</p> }
+            @else { <ol class="timeline">@for (entry of history(); track entry.id) { <li><span></span><div><strong>{{ actionLabel(entry.actionType) }}</strong><time>{{ entry.occurredUtc | date:'medium' }} · {{ entry.actorEmail }}</time></div></li> }</ol> }
+          </section>
+          <div class="panel-actions">
+            @if (member.residencyStatus === 2) { <button type="button" [disabled]="submitting()" (click)="restore(member.id)">Restore resident</button> }
+            @else { <button class="quiet" type="button" (click)="beginEdit()">Edit profile</button><button class="danger" type="button" [disabled]="submitting()" (click)="archive()">Archive resident</button> }
+          </div>
+        }
+      </article>
+    </section>
+  }
+
+  @if (editor) {
+    <section class="overlay" role="dialog" aria-modal="true" aria-labelledby="editor-title">
+      <form #memberForm="ngForm" class="panel editor" (ngSubmit)="save(memberForm)">
+        <button class="close" type="button" (click)="closePanels()" aria-label="Close form">×</button>
+        <p class="eyebrow">Pastor tools</p><h2 id="editor-title">{{ editingId === null ? 'Add resident' : 'Edit resident' }}</h2>
+        <p class="form-intro">Keep the family directory accurate. Fields marked * are required.</p>
+        <fieldset><legend>Personal details</legend><div class="form-grid">
+          <label>Given name *<input name="givenName" required maxlength="100" [(ngModel)]="editor.givenName" /></label>
+          <label>Family name *<input name="familyName" required maxlength="100" [(ngModel)]="editor.familyName" /></label>
+          <label>Preferred name<input name="preferredName" maxlength="100" [(ngModel)]="editor.preferredName" /></label>
+          <label>Home town *<input name="homeTown" required maxlength="100" [(ngModel)]="editor.homeTown" /></label>
+          <label>Date of birth *<input name="dateOfBirth" type="date" required [max]="maximumDate" [(ngModel)]="editor.dateOfBirth" /></label>
+          <label>Resident type *<select name="residentType" [disabled]="editingId !== null" [(ngModel)]="editor.residentType" (ngModelChange)="onResidentTypeChanged($event)"><option value="Student">Student</option><option value="Worker">Worker</option></select></label>
+        </div></fieldset>
+
+        @if (editor.residentType === 'Student') {
+          <fieldset><legend>Student details</legend><div class="form-grid">
+            <label>School<input name="schoolName" maxlength="200" [(ngModel)]="editor.studentDetails!.schoolName" /></label>
+            <label>Education level<input name="educationLevel" maxlength="100" [(ngModel)]="editor.studentDetails!.educationLevel" /></label>
+            <label>Student ID<input name="studentIdentifier" maxlength="100" [(ngModel)]="editor.studentDetails!.studentIdentifier" /></label>
+          </div></fieldset>
+        } @else {
+          <fieldset><legend>Worker details</legend><div class="form-grid">
+            <label>Employer<input name="employerName" maxlength="200" [(ngModel)]="editor.workerDetails!.employerName" /></label>
+            <label>Job title<input name="jobTitle" maxlength="150" [(ngModel)]="editor.workerDetails!.jobTitle" /></label>
+            <label>Work location<input name="workLocation" maxlength="200" [(ngModel)]="editor.workerDetails!.workLocation" /></label>
+            <label>Work phone<input name="workPhone" type="tel" maxlength="50" [(ngModel)]="editor.workerDetails!.workPhone" /></label>
+          </div></fieldset>
+        }
+
+        <fieldset><legend>Family & emergency contacts</legend>
+          @if (!editor.contacts?.length) { <p class="empty-inline">No contacts added yet.</p> }
+          @for (contact of editor.contacts; track $index; let index = $index) {
+            <section class="contact-editor"><header><strong>Contact {{ index + 1 }}</strong><button class="text-button danger-text" type="button" (click)="removeContact(index)">Remove</button></header>
+              <div class="form-grid">
+                <label>Full name *<input [name]="'contactName' + index" required maxlength="200" [(ngModel)]="contact.fullName" /></label>
+                <label>Relationship *<input [name]="'relationship' + index" required maxlength="100" [(ngModel)]="contact.relationship" /></label>
+                <label>Phone<input [name]="'phone' + index" type="tel" maxlength="50" [(ngModel)]="contact.phoneNumber" /></label>
+                <label>Email<input [name]="'email' + index" type="email" maxlength="254" [(ngModel)]="contact.email" /></label>
+              </div><div class="check-row"><label><input [name]="'guardian' + index" type="checkbox" [(ngModel)]="contact.isGuardian" /> Guardian</label><label><input [name]="'emergency' + index" type="checkbox" [(ngModel)]="contact.isEmergencyContact" /> Emergency contact</label></div>
+            </section>
+          }
+          <button class="quiet add-contact" type="button" (click)="addContact()">+ Add contact</button>
+        </fieldset>
+        <div class="sticky-actions"><button class="quiet" type="button" (click)="closePanels()">Cancel</button><button type="submit" [disabled]="submitting()">{{ submitting() ? 'Saving…' : 'Save resident' }}</button></div>
+      </form>
+    </section>
+  }
+
+  @if (showingArchive()) {
+    <section class="overlay" role="dialog" aria-modal="true" aria-labelledby="archive-title"><article class="panel archive">
+      <button class="close" type="button" (click)="showingArchive.set(false)" aria-label="Close archive history">×</button>
+      <p class="eyebrow">Pastor tools</p><h2 id="archive-title">Archive history</h2><p class="form-intro">Former residents are kept safely outside the active family directory.</p>
+      @if (archivedEntries().length === 0) { <p class="state">No archived resident profiles.</p> }
+      @else { <ul>@for (member of archivedEntries(); track member.id) { <li><button type="button" class="archive-member" (click)="showMember(member.id, true)"><strong>{{ displayName(member) }}</strong><span>{{ typeLabel(member.residentType) }} · archived {{ member.archivedUtc | date:'mediumDate' }}</span></button><button class="quiet" type="button" [disabled]="submitting()" (click)="restore(member.id)">Restore</button></li> }</ul> }
+    </article></section>
+  }
+</main>

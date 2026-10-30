@@ -1,0 +1,47 @@
+<main class="page-shell">
+  <section class="weather-card" aria-labelledby="page-title">
+    <p class="eyebrow">JMH Connect · Integration check</p>
+    <div class="heading-row">
+      <div>
+        <h1 id="page-title">Weather forecast</h1>
+        <p class="intro">A temporary check of the Angular to ASP.NET Core connection.</p>
+      </div>
+      <span class="api-badge">API test</span>
+    </div>
+
+    @if (loading()) {
+      <div class="status-panel" role="status" aria-live="polite">
+        <span class="spinner" aria-hidden="true"></span>
+        <span>Loading forecast…</span>
+      </div>
+    } @else if (errorMessage(); as message) {
+      <div class="status-panel error-panel" role="alert">
+        <div>
+          <h2>Couldn’t load the forecast</h2>
+          <p>{{ message }}</p>
+        </div>
+        <button type="button" class="retry-button" (click)="loadForecast()">Try again</button>
+      </div>
+    } @else {
+      <div class="success-heading" role="status" aria-live="polite">
+        <span class="success-dot" aria-hidden="true"></span>
+        <h2>Connected successfully</h2>
+        <span class="result-count">{{ forecasts().length }} days</span>
+      </div>
+      <ul class="forecast-list" aria-label="Weather forecast">
+        @for (forecast of forecasts(); track forecast.date) {
+          <li class="forecast-row">
+            <time [attr.datetime]="forecast.date">{{ forecast.date }}</time>
+            <span class="summary">{{ forecast.summary ?? 'No summary' }}</span>
+            <span class="temperature">{{ forecast.temperatureC }}°C</span>
+            <span class="secondary-temperature">{{ forecast.temperatureF }}°F</span>
+          </li>
+        } @empty {
+          <li class="empty-state">The API returned no forecast entries.</li>
+        }
+      </ul>
+    }
+
+    <footer class="card-footer">GET <code>/weatherforecast</code> · localhost:5080</footer>
+  </section>
+</main>

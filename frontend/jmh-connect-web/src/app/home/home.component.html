@@ -1,0 +1,29 @@
+<main class="dashboard-shell">
+  @if (auth.currentUser(); as user) {
+    <section class="welcome" aria-labelledby="dashboard-title">
+      <div><p class="eyebrow">JMH Connect · {{ user.role }} dashboard</p><h1 id="dashboard-title">Welcome to our JMH home</h1><p>A calm place to stay connected with our community, profile and shared life.</p></div>
+      <div class="welcome-actions">
+        @if (user.role === 'Member' && user.memberProfileId) { <a class="primary" routerLink="/my-profile">Open My Profile</a> }
+        <a class="secondary" routerLink="/members">View Family Directory</a>
+      </div>
+    </section>
+    <section class="quick-links" aria-label="Available modules">
+      @if (user.role === 'Member' && user.memberProfileId) { <a routerLink="/my-profile"><span class="icon mint">MP</span><span><strong>My Profile</strong><small>Update your preferred name, contacts and photo.</small></span><b>→</b></a> }
+      @else if (user.role === 'Member') { <article class="profile-link-warning"><span class="icon soft">MP</span><span><strong>My Profile unavailable</strong><small>No resident profile is linked to this signed-in account. Ask a Pastor to verify the account link.</small></span></article> }
+      <a routerLink="/members"><span class="icon blue">FD</span><span><strong>Family Directory</strong><small>Find active members of our JMH family.</small></span><b>→</b></a>
+      <a routerLink="/devotions"><span class="icon mint">DV</span><span><strong>Devotions & Attendance</strong><small>View sessions and your permitted attendance information.</small></span><b>→</b></a>
+      @if (user.role === 'Pastor' || user.role === 'Member') { <a routerLink="/duties"><span class="icon blue">DU</span><span><strong>{{ user.role === 'Pastor' ? 'Duty Planning' : 'My Duties' }}</strong><small>{{ user.role === 'Pastor' ? 'Assign responsibilities and follow completion.' : 'View and complete your assigned responsibilities.' }}</small></span><b>→</b></a> }
+      <a routerLink="/events"><span class="icon mint">EV</span><span><strong>Community Events</strong><small>Browse the JMH event list and calendar.</small></span><b>→</b></a>
+      <a routerLink="/birthdays"><span class="icon soft">BD</span><span><strong>Birthdays</strong><small>Shared family birthday reminders.</small></span><b>→</b></a>
+      <a routerLink="/announcements"><span class="icon blue">AN</span><span><strong>Announcements</strong><small>Community updates for you.</small></span><b>→</b></a>
+    </section>
+    <section class="section-heading"><div><p class="eyebrow">At a glance</p><h2>Family reminders</h2></div></section>
+    <section class="module-grid" aria-label="Family reminders">
+      <article><span class="icon soft">BD</span><div><h3>Upcoming birthdays</h3>@for (birthday of birthdays(); track birthday.memberProfileId) { <p>{{ birthday.displayName }} · {{ birthday.nextOccurrence | date:'d MMM' }}</p> } @empty { <p>No shared birthdays coming up.</p> }</div><a routerLink="/birthdays">View</a></article>
+      <article><span class="icon blue">AN</span><div><h3>Announcements</h3>@for (announcement of announcements(); track announcement.id) { <p>{{ announcement.title }}</p> } @empty { <p>No announcements right now.</p> }</div><a routerLink="/announcements">View</a></article>
+      @if (user.role !== 'Leader') { <article><span class="icon mint">DU</span><div><h3>Upcoming duties</h3>@for (duty of upcomingDuties(); track duty.id) { <p>{{ duty.title }} · {{ duty.scheduledForUtc | date:'d MMM' }}</p> } @empty { <p>No duties in the next 14 days.</p> }</div><a routerLink="/duties">View</a></article> }
+      <article><span class="icon soft">EV</span><div><h3>Upcoming events</h3>@for (event of upcomingEvents(); track event.id) { <p>{{ event.title }} · {{ event.startsUtc | date:'d MMM' }}</p> } @empty { <p>No events in the next 14 days.</p> }</div><a routerLink="/events">View</a></article>
+    </section>
+    <footer class="account-bar"><span>Signed in as <strong>{{ user.email }}</strong></span><button type="button" [disabled]="busy" (click)="logout()">{{ busy ? 'Signing out…' : 'Sign out' }}</button></footer>
+  }
+</main>

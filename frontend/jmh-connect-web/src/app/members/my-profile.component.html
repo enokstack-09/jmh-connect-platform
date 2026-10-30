@@ -1,0 +1,37 @@
+<main class="profile-shell">
+  <header><p class="eyebrow">My Profile</p><h1>Your place in the JMH family</h1><p>Keep your preferred name and contact information current. Official details remain Pastor-managed.</p></header>
+  @if (error()) { <p class="message error" role="alert">{{ error() }}</p> }
+  @if (notice()) { <p class="message success" role="status">{{ notice() }}</p> }
+  @if (loading()) { <p class="state" role="status">Loading your profile…</p> }
+  @else if (profile(); as profile) {
+    <section class="profile-card">
+      <aside class="identity">
+        @if (profile.hasApprovedPhoto) { <img [src]="photoUrl()" [alt]="displayName() + ' profile photo'" /> } @else { <span class="avatar">{{ displayName().slice(0,1) }}</span> }
+        <h2>{{ displayName() || 'Name not recorded' }}</h2><p>{{ (profile.givenName + ' ' + profile.familyName).trim() || 'Official name not recorded' }}</p><span class="type">{{ profile.residentType === 1 ? 'Student' : profile.residentType === 2 ? 'Worker' : 'Resident type not recorded' }}</span>
+        <dl><div><dt>Home town</dt><dd>{{ profile.homeTown || 'Not recorded' }}</dd></div><div><dt>Date of birth</dt><dd>{{ profile.dateOfBirth ? (profile.dateOfBirth | date:'longDate') : 'Not recorded' }}</dd></div></dl>
+        <small>Official identity, residency and education/work details can only be changed by a Pastor.</small>
+      </aside>
+      <div class="content">
+        <form #selfForm="ngForm" (ngSubmit)="save(selfForm)">
+          <section><h2>How we address you</h2><label>Preferred name<input name="preferredName" maxlength="100" [(ngModel)]="editor!.preferredName" /></label></section>
+          <section><div class="section-title"><div><h2>Family & emergency contacts</h2><p>Guardian designation and guardian identity are Pastor-managed.</p></div><button class="quiet" type="button" (click)="addContact()">+ Add contact</button></div>
+            @for (contact of editor!.contacts; track $index; let index=$index) {
+              <article class="contact-editor"><div class="contact-heading"><strong>Contact {{ index + 1 }}</strong>@if (isGuardian(contact.id)) { <span>Guardian</span> } @else { <button type="button" (click)="removeContact(index)">Remove</button> }</div>
+                <div class="form-grid"><label>Full name<input [name]="'name'+index" required maxlength="200" [readonly]="isGuardian(contact.id)" [(ngModel)]="contact.fullName" /></label><label>Relationship<input [name]="'relationship'+index" required maxlength="100" [readonly]="isGuardian(contact.id)" [(ngModel)]="contact.relationship" /></label><label>Phone<input [name]="'phone'+index" maxlength="50" [(ngModel)]="contact.phoneNumber" /></label><label>Email<input [name]="'email'+index" type="email" maxlength="254" [(ngModel)]="contact.email" /></label></div>
+                <label class="check"><input [name]="'emergency'+index" type="checkbox" [(ngModel)]="contact.isEmergencyContact" /> Emergency contact</label>
+              </article>
+            }
+          </section>
+          <button class="primary" type="submit" [disabled]="saving()">{{ saving() ? 'Saving…' : 'Save my profile' }}</button>
+        </form>
+        <section class="photo-section"><h2>Profile photo</h2><p>New photos stay private until a Pastor approves them.</p>
+          @if (photoManagement(); as photo) {
+            @if (photo.pendingPhoto) { <p class="pending">Photo awaiting Pastor approval since {{ photo.pendingPhoto.createdUtc | date:'mediumDate' }}.</p> }
+            @if (photo.requiresGuardianConsent && !photo.activeConsent) { <p class="privacy">A Pastor must record guardian consent before an under-18 photo can be submitted.</p> }
+            <div class="upload"><input type="file" accept="image/jpeg,image/png,image/webp" (change)="selectPhoto($event)" /><button type="button" [disabled]="!photoFile || saving() || (photo.requiresGuardianConsent && !photo.activeConsent)" (click)="uploadPhoto()">Submit photo</button></div><small>JPEG, PNG or WebP · maximum 5 MB</small>
+          }
+        </section>
+      </div>
+    </section>
+  }
+</main>
