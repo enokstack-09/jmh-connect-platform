@@ -54,3 +54,11 @@ a:focus-visible, button:focus-visible { outline: 3px solid #7cd5c7; outline-offs
   .role-chip { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { .sidebar, .backdrop { transition: none; } }
+
+/* ---------- Motion ---------- */
+.sidebar { animation: jmh-fade .5s ease backwards; }
+.nav a { animation: jmh-rise .5s cubic-bezier(.2, .7, .2, 1) backwards; animation-delay: calc(.08s + var(--i, 0) * 45ms); }
+.topbar { animation: jmh-fade .5s ease backwards; }
+.nav a .i { transition: transform .2s ease; }
+.nav a:hover .i { transform: scale(1.12); }
+@media (prefers-reduced-motion: reduce) { .sidebar, .nav a, .topbar { animation: none; } }

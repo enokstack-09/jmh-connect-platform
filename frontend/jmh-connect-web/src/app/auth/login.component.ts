@@ -42,6 +42,7 @@ import { AuthService } from './auth.service';
               }
 
               <button type="submit" [disabled]="busy() || loginForm.invalid">
+                @if (busy()) { <span class="spinner" aria-hidden="true"></span> }
                 {{ busy() ? 'Signing in…' : 'Sign in' }}
               </button>
             </form>
@@ -87,7 +88,17 @@ import { AuthService } from './auth.service';
       .tagline h2 { font-size: 2rem; }
       .tagline p, .back { display: none; }
     }
-    @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+    .auth-brand .logo, .tagline h2, .tagline p, .back { animation: jmh-rise .7s cubic-bezier(.2, .7, .2, 1) backwards; }
+    .tagline h2 { animation-delay: .12s; }
+    .tagline p { animation-delay: .24s; }
+    .back { animation-delay: .36s; }
+    .auth-card { animation: jmh-rise .7s cubic-bezier(.2, .7, .2, 1) .15s backwards; }
+    form { transition: box-shadow .25s ease; }
+    form:focus-within { box-shadow: 0 .8rem 2.4rem rgb(70 75 113 / 14%); }
+    .spinner { display: inline-block; width: .95rem; height: .95rem; margin-right: .55rem; vertical-align: -.15rem; border: 2px solid rgb(255 255 255 / 40%); border-top-color: #fff; border-radius: 50%; animation: jmh-spin .7s linear infinite; }
+    button:active:not(:disabled) { transform: scale(.98); }
+    .error { animation: jmh-rise .3s ease backwards; }
+    @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
   `,
 })
 export class LoginComponent implements OnInit {

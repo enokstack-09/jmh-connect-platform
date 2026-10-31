@@ -8,8 +8,8 @@
 
       <p class="nav-label">Menu</p>
       <nav class="nav" aria-label="Main navigation">
-        @for (item of navItems(); track item.path) {
-          <a [routerLink]="item.path" routerLinkActive="active">
+        @for (item of navItems(); track item.path; let i = $index) {
+          <a [routerLink]="item.path" routerLinkActive="active" [style.--i]="i">
             <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="item.icon" /></svg>
             {{ item.label }}
           </a>

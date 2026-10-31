@@ -116,3 +116,33 @@ img { max-width: 100%; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* ===== Motion system: calm, short, GPU-friendly (opacity + transform only) ===== */
+@keyframes jmh-fade { from { opacity: 0; } }
+@keyframes jmh-rise { from { opacity: 0; transform: translateY(18px); } }
+@keyframes jmh-pop { from { opacity: 0; transform: translateY(14px) scale(.96); } }
+@keyframes jmh-float { 50% { transform: translateY(-8px); } }
+@keyframes jmh-spin { to { transform: rotate(360deg); } }
+
+/* Every routed page eases in. */
+.shell-main > *:not(router-outlet) {
+  animation: jmh-page-in .45s cubic-bezier(.2, .7, .2, 1) backwards;
+}
+
+@keyframes jmh-page-in {
+  from { opacity: 0; transform: translateY(10px); }
+}
+
+/* Scroll reveal (see RevealDirective). Hover transforms keep working afterwards. */
+.reveal:not(.revealed) { opacity: 0; }
+.reveal.revealed {
+  animation: jmh-rise .75s cubic-bezier(.2, .7, .2, 1) backwards;
+  animation-delay: var(--reveal-delay, 0ms);
+}
+
+button:not(:disabled):active { transform: scale(.98); }
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal:not(.revealed) { opacity: 1; }
+  .reveal.revealed, .shell-main > *:not(router-outlet) { animation: none; }
+}

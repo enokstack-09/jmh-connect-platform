@@ -93,3 +93,21 @@ h2 { margin-bottom: 1.6rem; color: #464b71; font-family: "Cormorant Garamond", G
   .preview-card.two { top: 11rem; right: 1rem; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---------- Motion (subtle, respects reduced-motion) ---------- */
+.site-header { animation: jmh-fade .6s ease backwards; }
+.hero-copy > * { animation: jmh-rise .8s cubic-bezier(.2, .7, .2, 1) backwards; }
+.hero-copy > :nth-child(1) { animation-delay: .1s; }
+.hero-copy > :nth-child(2) { animation-delay: .2s; }
+.hero-copy > :nth-child(3) { animation-delay: .32s; }
+.hero-copy > :nth-child(4) { animation-delay: .44s; }
+.hero-copy > :nth-child(5) { animation-delay: .56s; }
+.preview-card.main { animation: jmh-pop .9s cubic-bezier(.2, .7, .2, 1) .45s backwards, jmh-float 7s ease-in-out 1.4s infinite; }
+.preview-card.side { animation: jmh-pop .9s cubic-bezier(.2, .7, .2, 1) .65s backwards, jmh-float 8s ease-in-out 1.6s infinite reverse; }
+.preview-card.two { animation: jmh-pop .9s cubic-bezier(.2, .7, .2, 1) .85s backwards, jmh-float 9s ease-in-out 1.8s infinite; }
+.btn .arrow { display: inline-block; margin-left: .5rem; transition: transform .2s ease; }
+.btn:hover .arrow { transform: translateX(4px); }
+.btn:active { transform: scale(.98); }
+.section, .cta { scroll-margin-top: 5rem; }
+.card:hover .icon { transform: scale(1.08) rotate(-4deg); }
+.icon { transition: transform .25s ease; }

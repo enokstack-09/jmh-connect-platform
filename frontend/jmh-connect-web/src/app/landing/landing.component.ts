@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
+import { RevealDirective } from '../shared/reveal.directive';
 
 interface Feature {
   title: string;
@@ -11,7 +12,7 @@ interface Feature {
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink],
+  imports: [RouterLink, RevealDirective],
   templateUrl: './landing.component.html',
   styleUrl: './landing.component.scss',
 })
