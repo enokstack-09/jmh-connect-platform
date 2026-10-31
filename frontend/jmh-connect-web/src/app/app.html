@@ -1,17 +1,50 @@
-<header class="app-header">
-  <a class="brand" routerLink="/home"><span>JMH</span> Connect</a>
-  <nav aria-label="Main navigation">
-    @if (auth.currentUser(); as user) {
-      <a routerLink="/home" routerLinkActive="active">Dashboard</a>
-      @if (user.role === 'Member' && user.memberProfileId) { <a routerLink="/my-profile" routerLinkActive="active">My Profile</a> }
-      <a routerLink="/members" routerLinkActive="active">Family Directory</a>
-      <a routerLink="/devotions" routerLinkActive="active">Devotions</a>
-      @if (user.role === 'Pastor' || user.role === 'Member') { <a routerLink="/duties" routerLinkActive="active">Duties</a> }
-      <a routerLink="/events" routerLinkActive="active">Events</a>
-      <a routerLink="/birthdays" routerLinkActive="active">Birthdays</a>
-      <a routerLink="/announcements" routerLinkActive="active">Announcements</a>
-      @if (user.role === 'Pastor') { <a routerLink="/reports" routerLinkActive="active">Reports</a> }
-    } @else { <a routerLink="/login" routerLinkActive="active">Sign in</a> }
-  </nav>
-</header>
-<router-outlet />
+<div class="shell" [class.has-shell]="showShell()" [class.menu-open]="menuOpen()">
+  @if (showShell()) {
+    <aside id="app-sidebar" class="sidebar" aria-label="Application sidebar">
+      <a class="brand" routerLink="/home" aria-label="JMH Connect dashboard">
+        <span class="brand-mark">JMH</span>
+        <span class="brand-name">Connect<small>Family Platform</small></span>
+      </a>
+
+      <p class="nav-label">Menu</p>
+      <nav class="nav" aria-label="Main navigation">
+        @for (item of navItems(); track item.path) {
+          <a [routerLink]="item.path" routerLinkActive="active">
+            <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="item.icon" /></svg>
+            {{ item.label }}
+          </a>
+        }
+      </nav>
+
+      @if (auth.currentUser(); as user) {
+        <div class="me">
+          <span class="avatar" aria-hidden="true">{{ initials() }}</span>
+          <div class="me-text"><strong>{{ user.email }}</strong><span>{{ user.role }}</span></div>
+        </div>
+        <button class="signout" type="button" [disabled]="signingOut()" (click)="logout()">
+          {{ signingOut() ? 'Signing out…' : 'Sign out' }}
+        </button>
+      }
+    </aside>
+    <div class="backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+  }
+
+  <div class="column">
+    @if (showShell()) {
+      <header class="topbar">
+        <button class="menu-btn" type="button" aria-controls="app-sidebar" [attr.aria-expanded]="menuOpen()" aria-label="Toggle navigation menu" (click)="toggleMenu()">
+          <svg class="i" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+        <a class="mobile-brand" routerLink="/home"><span class="brand-mark">JMH</span>Connect</a>
+        <span class="spacer"></span>
+        @if (auth.currentUser(); as user) {
+          <span class="role-chip">{{ user.role }}</span>
+          <span class="avatar small" aria-hidden="true">{{ initials() }}</span>
+        }
+      </header>
+    }
+    <div class="shell-main">
+      <router-outlet />
+    </div>
+  </div>
+</div>

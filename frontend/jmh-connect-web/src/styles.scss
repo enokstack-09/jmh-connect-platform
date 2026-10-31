@@ -1,19 +1,118 @@
+/* ===== JMH Connect · global design layer =====
+   Approved palette: #464B71 primary · #118AB2 secondary · #7CD5C7 accent · #F2F2ED background */
+:root {
+  --jmh-primary: #464b71;
+  --jmh-primary-deep: #2b2f4a;
+  --jmh-secondary: #118ab2;
+  --jmh-accent: #7cd5c7;
+  --jmh-bg: #f2f2ed;
+  --jmh-ink: #232740;
+  --jmh-hair: rgb(70 75 113 / 12%);
+  --jmh-serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+}
+
 html {
   min-width: 320px;
-  background: #f2f2ed;
+  background: var(--jmh-bg);
+  scroll-behavior: smooth;
 }
 
 body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  color: #292c3b;
+  color: #292d42;
   font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+  background:
+    radial-gradient(60rem 30rem at 85% -10%, rgb(17 138 178 / 7%), transparent 60%),
+    radial-gradient(50rem 30rem at 15% 110%, rgb(124 213 199 / 10%), transparent 60%),
+    var(--jmh-bg);
 }
 
 *,
 *::before,
 *::after {
   box-sizing: border-box;
+}
+
+img { max-width: 100%; }
+::selection { color: var(--jmh-primary-deep); background: rgb(124 213 199 / 55%); }
+
+/* ---- Premium refinements for every page rendered inside the app shell ----
+   Doubled class raises specificity above component-scoped styles.
+   Scoped to .has-shell so the public landing/login pages are untouched. */
+.has-shell .shell-main.shell-main {
+  h1 {
+    font-family: var(--jmh-serif);
+    font-weight: 600;
+    letter-spacing: -.01em;
+  }
+
+  .section-heading h2 {
+    font-family: var(--jmh-serif);
+    font-weight: 700;
+  }
+
+  :is(.hero, .welcome, .directory-header, .page-header) {
+    position: relative;
+    overflow: hidden;
+    border-radius: 1.6rem;
+    box-shadow: 0 1.6rem 3.4rem rgb(42 46 73 / 20%);
+  }
+
+  :is(.hero, .welcome)::after {
+    content: "";
+    position: absolute;
+    right: -5rem;
+    top: -5rem;
+    width: 17rem;
+    height: 17rem;
+    border-radius: 50%;
+    border: 1px solid rgb(124 213 199 / 28%);
+    box-shadow: 0 0 0 2rem rgb(124 213 199 / 5%), 0 0 0 4rem rgb(124 213 199 / 3%);
+    pointer-events: none;
+  }
+
+  :is(.hero, .welcome) > * { position: relative; z-index: 1; }
+
+  article,
+  .profile-card,
+  .panel {
+    border-color: var(--jmh-hair);
+  }
+
+  button,
+  a {
+    transition: transform .18s ease, box-shadow .2s ease, background-color .2s ease, color .2s ease, border-color .2s ease;
+  }
+
+  button:not(:disabled):hover { transform: translateY(-1px); }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--jmh-secondary);
+    outline: 0;
+    box-shadow: 0 0 0 4px rgb(17 138 178 / 14%);
+  }
+
+  button:focus-visible,
+  a:focus-visible {
+    outline: 3px solid var(--jmh-secondary);
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 40rem) {
+  .has-shell .shell-main.shell-main :is(.hero, .welcome, .directory-header, .page-header) {
+    border-radius: 1.2rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }

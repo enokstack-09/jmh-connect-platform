@@ -1,0 +1,94 @@
+<header class="site-header">
+  <a class="brand" routerLink="/" aria-label="JMH Connect home">
+    <span class="brand-mark">JMH</span><span class="brand-name">Connect</span>
+  </a>
+  <nav class="site-nav" aria-label="Page sections">
+    <a href="#features">Features</a>
+    <a href="#privacy">Privacy</a>
+    <a href="#access">Access</a>
+  </nav>
+  @if (auth.currentUser()) {
+    <a class="btn btn-accent" routerLink="/home">Open dashboard</a>
+  } @else {
+    <a class="btn btn-accent" routerLink="/login">Sign in</a>
+  }
+</header>
+
+<main>
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="hero-copy">
+      <p class="eyebrow">JMH Connect</p>
+      <h1 id="hero-title">A calm home for our <em>JMH</em> family</h1>
+      <p class="lead">Stay connected with your community, devotions, duties, events and shared life, all in one private, welcoming place.</p>
+      <div class="actions">
+        @if (auth.currentUser()) {
+          <a class="btn btn-accent" routerLink="/home">Open dashboard</a>
+        } @else {
+          <a class="btn btn-accent" routerLink="/login">Sign in to continue</a>
+        }
+        <a class="btn btn-ghost" href="#features">Explore features</a>
+      </div>
+      <p class="note">Accounts are created by a Pastor. Public sign-up is unavailable.</p>
+    </div>
+
+    <div class="preview" aria-hidden="true">
+      <div class="preview-card main">
+        <span class="chip">Upcoming</span>
+        <strong>Sunday Fellowship</strong>
+        <small>This week · Main Hall</small>
+      </div>
+      <div class="preview-card side">
+        <span class="dot"></span>
+        <div><strong>2 duties</strong><small>assigned to you</small></div>
+      </div>
+      <div class="preview-card side two">
+        <span class="dot blue"></span>
+        <div><strong>5 birthdays</strong><small>coming up</small></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="features" class="section" aria-labelledby="features-title">
+    <p class="kicker">Everything in one place</p>
+    <h2 id="features-title">Built for how our family lives together</h2>
+    <div class="grid">
+      @for (feature of features; track feature.title) {
+        <article class="card">
+          <span class="icon" [class]="feature.tone">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path [attr.d]="feature.icon" /></svg>
+          </span>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.text }}</p>
+        </article>
+      }
+    </div>
+  </section>
+
+  <section id="privacy" class="section band" aria-labelledby="privacy-title">
+    <div class="band-copy">
+      <p class="kicker">Private by design</p>
+      <h2 id="privacy-title">Your information stays with our family</h2>
+      <p>Each person sees only what their role allows. Shared birthdays never reveal birth year or age, and official details remain Pastor-managed.</p>
+    </div>
+    <ul class="checks">
+      <li>Secure sign-in with protected sessions</li>
+      <li>Role-based access for Pastors, Leaders and Members</li>
+      <li>Record-level privacy for resident information</li>
+    </ul>
+  </section>
+
+  <section id="access" class="cta" aria-labelledby="cta-title">
+    <h2 id="cta-title">Ready to join the conversation?</h2>
+    <p>Sign in with the account your Pastor created for you.</p>
+    @if (auth.currentUser()) {
+      <a class="btn btn-accent" routerLink="/home">Open dashboard</a>
+    } @else {
+      <a class="btn btn-accent" routerLink="/login">Sign in</a>
+    }
+  </section>
+</main>
+
+<footer class="site-footer">
+  <span>© {{ year }} JMH Connect</span>
+  <span>A private community platform</span>
+</footer>

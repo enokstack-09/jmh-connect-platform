@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { LandingComponent } from './landing/landing.component';
 import { AccountSetupComponent } from './auth/account-setup.component';
 import { authGuard } from './auth/auth.guard';
 import { LoginComponent } from './auth/login.component';
@@ -13,7 +14,7 @@ import { AnnouncementsComponent } from './announcements/announcements.component'
 import { ReportsComponent } from './reports/reports.component';
 
 export const routes: Routes = [
-  { path: '', pathMatch: 'full', redirectTo: 'home' },
+  { path: '', pathMatch: 'full', component: LandingComponent },
   { path: 'login', component: LoginComponent },
   { path: 'account/setup', component: AccountSetupComponent },
   { path: 'home', component: HomeComponent, canActivate: [authGuard] },
